@@ -2,8 +2,9 @@ package ru.bookit.auth.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.bookit.auth.entity.User;
@@ -14,16 +15,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class JwtService {
 
-    private final SecretKey key;
-    private final long accessTtlMinutes;
+    @Value("${app.jwt.secret}")
+    SecretKey key;
 
-    public JwtService(@Value("${app.jwt.secret}") String secret,
-                      @Value("${app.jwt.access-ttl-minutes}") long accessTtlMinutes) {
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
-        this.accessTtlMinutes = accessTtlMinutes;
-    }
+    @Value("${app.jwt.access-ttl-minutes}")
+    long accessTtlMinutes;
 
     public String generateAccessToken(User user) {
         Instant now = Instant.now();
